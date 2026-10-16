@@ -1,0 +1,107 @@
+* {
+  border: 1px solid black;
+}
+
+:root {
+  font-family: arial;
+  font-size: 20px;
+}
+
+body {
+  margin: 0;
+  align-content: center;
+}
+
+main {
+  width: 50vw;
+  height: 70vh;
+  margin: auto;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10%;
+}
+
+/* index elements */
+
+#top-player-list {
+  width: 50%;
+  height: 50%;
+
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+}
+
+.top-player {
+  width: 100%;
+  height: auto;
+}
+
+#user-input {
+  width: 50%;
+  height: 15%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10%;
+}
+
+#input-username {
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  text-align: center;
+  font-size: 20px;
+}
+
+#input-submit {
+  width: 20%;
+  height: 50%;
+}
+
+/* game elements, static */
+
+#board {
+  width: 90%;
+  height: fit-content;
+
+  display: grid;
+  grid-template: repeat(5, 1fr) / repeat(6, 1fr);
+  justify-items: center;
+  gap: 1rem;
+}
+
+#data {
+  width: 100%;
+  height: 10%;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.data-box {
+  width: 30%;
+  display: flex;
+}
+
+article {
+  display: flex;
+}
+
+/* game elements, dynamic */
+
+.game-card {
+  width: 70%;
+  height: auto;
+  aspect-ratio: 1;
+}
