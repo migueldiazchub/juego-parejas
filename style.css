@@ -116,5 +116,6 @@ article {
 }
 
 .game-card-hidden {
-  display: none;
+  background-color: lightgray;
+  color: red;
 }
