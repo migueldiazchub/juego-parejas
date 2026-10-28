@@ -7,7 +7,10 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main id="game-window">
+    <main id="start-window">
+      <button id="game-start">START</button>
+    </main>
+    <main id="game-window" class="hidden">
       <section id="board"></section>
       <section id="data">
         <article class="data-box">
@@ -24,7 +27,6 @@
         </article>
       </section>
     </main>
-    <button id="game-start">START</button>
     <script type="module" src="game.js"></script>
   </body>
 </html>

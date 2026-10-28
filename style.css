@@ -121,18 +121,18 @@ article {
 }
 
 #game-start {
-  width: 10rem;
-  height: 3rem;
+  width: 50%;
+  height: 10%;
   margin: auto;
-
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  transform: translate(-50%, 0);
+  font-size: 36px;
 
   transition: background-color 200ms;
 }
 
 #game-start:hover {
   background-color: lightgray;
+}
+
+.hidden {
+  display: none;
 }

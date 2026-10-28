@@ -66,8 +66,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 1000);
     let gameTimer = setTimeout(() => {
       clearInterval(timeInterval);
+      endGame();
       console.log("time out");
     }, seconds * 1000);
+  }
+
+  //puntuación
+  function updateScore() {
+    const scoreDisplay = document.getElementById("data-score");
+    scoreDisplay.textContent = gameController.score;
   }
 
   //funciones para la lógica del juego
@@ -83,19 +90,27 @@ document.addEventListener("DOMContentLoaded", function () {
     return cardId;
   }
 
+  function flipHandler(event) {
+    const card = event.currentTarget.firstChild;
+    const cardId = event.currentTarget.id;
+
+    card.classList.toggle("game-card-hidden");
+    if (card.classList.contains("game-card-hidden")) {
+      card.textContent = "";
+    } else {
+      card.textContent = cardData[cardId];
+    }
+
+    gameController.previousSelected = gameController.currentSelected;
+    gameController.currentSelected = cardId;
+
+    document.dispatchEvent(flipEvent);
+    console.log(cardData[cardId]);
+  }
+
   const flipEvent = new Event("flip");
   function cardClickListener(element) {
-    element.addEventListener(
-      "click",
-      function () {
-        gameController.previousSelected = gameController.currentSelected;
-        gameController.currentSelected = flipCard(this.id);
-
-        document.dispatchEvent(flipEvent);
-        console.log(cardData[this.id]);
-      },
-      { once: true },
-    );
+    element.addEventListener("click", flipHandler, { once: true });
   }
 
   function setBoardInteraction() {
@@ -105,19 +120,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  //not working currently
+  //not working exactly as intended
+  //conflicts with restore timeout
   function removeBoardInteraction() {
     const cardElements = document.getElementsByClassName("game-card-container");
     for (let element of cardElements) {
-      element.removeEventListener("click");
+      element.removeEventListener("click", flipHandler);
     }
   }
 
   function checkCardPair(currentId, previousId) {
     console.log(gameController);
     if (cardData[currentId] === cardData[previousId]) {
+      gameController.score += 10;
+      updateScore();
       return true;
     } else {
+      gameController.score -= 1;
+      updateScore();
       return false;
     }
   }
@@ -132,11 +152,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const cardData = setBoard();
 
   function startGame() {
-    gameTimer(5);
+    document.getElementById("start-window").classList.add("hidden");
+    document.getElementById("game-window").classList.remove("hidden");
     setBoardInteraction();
+    gameTimer(5);
+  }
+
+  function endGame() {
+    removeBoardInteraction();
   }
 
   const gameController = {
+    score: 0,
     currentSelected: null,
     previousSelected: null,
     clearSelection: function () {
@@ -145,8 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   };
 
-  const startButton = document.getElementById("game-start");
-  startButton.addEventListener("click", startGame);
+  document.getElementById("game-start").addEventListener("click", startGame);
 
   document.addEventListener("flip", function () {
     console.log("flip");
