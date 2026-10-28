@@ -119,3 +119,20 @@ article {
   background-color: lightgray;
   color: red;
 }
+
+#game-start {
+  width: 10rem;
+  height: 3rem;
+  margin: auto;
+
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, 0);
+
+  transition: background-color 200ms;
+}
+
+#game-start:hover {
+  background-color: lightgray;
+}

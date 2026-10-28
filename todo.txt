@@ -1,0 +1,13 @@
+script
+    -carga inicial y botón empezar
+    -fetch imágenes y guardado para su uso
+    -lógica de puntos
+    -temporizador
+
+interfaz:
+    -fondos, bordes, etc
+    -api para imágenes cartas
+
+validación php
+
+mongo atlas db
