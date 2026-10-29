@@ -116,6 +116,11 @@ article {
   background-color: white;
 }
 
+.game-card-image {
+  width: 100%;
+  height: 100%;
+}
+
 .game-card-hidden {
   background-color: lightgray;
   color: red;

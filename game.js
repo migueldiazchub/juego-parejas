@@ -32,22 +32,18 @@ async function getPictures() {
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
-  // const list = await getPictures();
-  // for (let picture of list) {
-  //   const img = document.createElement("img");
-  //   img.src = picture;
-  //   img.width = 100;
-  //   img.height = 100;
-  //   // document.querySelector("body").append(img);
-  // }
   // funciones para crear las cartas y el tablero
-  function createCardValues() {
-    const cardList = [];
-    const cardValues = "ABCDEFGHIJKLMNO";
-    for (let i = 0; i < 30; i++) {
-      cardList.push(cardValues[Math.floor(i / 2)]);
+  async function getImageElements() {
+    const urlList = await getPictures();
+    const imgData = {};
+    for (let id = 0; id < 30; id++) {
+      const img = document.createElement("img");
+      const imgId = `img${Math.floor(id / 2)}`;
+      img.src = urlList[Math.floor(id / 2)];
+      img.classList.add("game-card-image");
+      imgData[imgId] = img;
     }
-    return cardList;
+    return imgData;
   }
 
   function shuffleCards(array) {
@@ -67,13 +63,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  function createCardElement(id, value) {
+  function createCardElement(id) {
     const cardContainer = document.createElement("article");
     cardContainer.classList.add("game-card-container");
     cardContainer.id = id;
 
     const cardContent = document.createElement("div");
-    //cardContent.textContent = value;
     cardContent.classList.add("game-card-content", "game-card-hidden");
 
     cardContainer.appendChild(cardContent);
@@ -82,14 +77,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function setBoard() {
     const cardData = {};
+    const numberArray = [];
+    for (let i = 0; i < 30; i++) {
+      numberArray.push(Math.floor(i / 2));
+    }
+    shuffleCards(numberArray);
+
     const board = document.getElementById("board");
-    const cardValueList = createCardValues();
-    shuffleCards(cardValueList);
     for (let id = 0; id < 30; id++) {
       const cardId = `card${id}`;
-      cardData[cardId] = cardValueList[id];
-
-      const newCardContainer = createCardElement(cardId, cardValueList[id]);
+      const imgId = `img${numberArray[id]}`;
+      cardData[cardId] = imgId;
+      const newCardContainer = createCardElement(cardId);
       board.appendChild(newCardContainer);
     }
     return cardData;
@@ -121,12 +120,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   function flipHandler(event) {
     const card = event.currentTarget.firstChild;
     const cardId = event.currentTarget.id;
+    const imgId = cardData[cardId];
 
     card.classList.toggle("game-card-hidden");
     if (card.classList.contains("game-card-hidden")) {
-      card.textContent = "";
+      card.removeChild(imgData[imgId]);
     } else {
-      card.textContent = cardData[cardId];
+      card.appendChild(imgData[imgId]);
     }
 
     gameController.previousSelected = gameController.currentSelected;
@@ -172,6 +172,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     card.firstChild.textContent = "";
   }
 
+  const imgData = await getImageElements();
   const cardData = setBoard();
 
   const gameController = {
@@ -188,12 +189,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("start-window").classList.add("hidden");
     document.getElementById("game-window").classList.remove("hidden");
     setBoardInteraction();
-    gameTimer(5);
+    gameTimer(600);
   }
 
   const endEvent = new Event("gameEnd");
   function endGame() {
-    removeBoardInteraction();
+    //removeBoardInteraction();
   }
 
   document.getElementById("game-start").addEventListener("click", startGame);
