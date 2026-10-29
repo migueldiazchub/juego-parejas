@@ -1,6 +1,45 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", function () {
+// cat api key
+// live_K3RykO2vhIYOYfR0ES49AC4VCAUPWZkWQk8PihbhQUrSmKY6TExVpIVFi0umhVR9
+
+// https://api.thecatapi.com/v1/images/search?limit=15
+
+async function getPictures() {
+  const pictureUrlList = [];
+  try {
+    const response = await fetch(
+      "https://api.thecatapi.com/v1/images/search?limit=15",
+      {
+        headers: {
+          "x-api-key":
+            "live_K3RykO2vhIYOYfR0ES49AC4VCAUPWZkWQk8PihbhQUrSmKY6TExVpIVFi0umhVR9",
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    for (let item of result) {
+      pictureUrlList.push(item.url);
+    }
+    return pictureUrlList;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+  // const list = await getPictures();
+  // for (let picture of list) {
+  //   const img = document.createElement("img");
+  //   img.src = picture;
+  //   img.width = 100;
+  //   img.height = 100;
+  //   // document.querySelector("body").append(img);
+  // }
   // funciones para crear las cartas y el tablero
   function createCardValues() {
     const cardList = [];
@@ -66,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 1000);
     let gameTimer = setTimeout(() => {
       clearInterval(timeInterval);
-      endGame();
+      document.dispatchEvent(endEvent);
       console.log("time out");
     }, seconds * 1000);
   }
@@ -78,18 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   //funciones para la lógica del juego
-  function flipCard(cardId) {
-    const card = document.getElementById(cardId).firstChild;
-    card.classList.toggle("game-card-hidden");
-    if (card.classList.contains("game-card-hidden")) {
-      card.textContent = "";
-    } else {
-      card.textContent = cardData[cardId];
-    }
-
-    return cardId;
-  }
-
+  const flipEvent = new Event("flip");
   function flipHandler(event) {
     const card = event.currentTarget.firstChild;
     const cardId = event.currentTarget.id;
@@ -108,7 +136,6 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(cardData[cardId]);
   }
 
-  const flipEvent = new Event("flip");
   function cardClickListener(element) {
     element.addEventListener("click", flipHandler, { once: true });
   }
@@ -132,35 +159,20 @@ document.addEventListener("DOMContentLoaded", function () {
   function checkCardPair(currentId, previousId) {
     console.log(gameController);
     if (cardData[currentId] === cardData[previousId]) {
-      gameController.score += 10;
-      updateScore();
       return true;
     } else {
-      gameController.score -= 1;
-      updateScore();
       return false;
     }
   }
 
-  function restoreCards(currentId, previousId) {
-    cardClickListener(document.getElementById(currentId));
-    cardClickListener(document.getElementById(previousId));
-    flipCard(currentId);
-    flipCard(previousId);
+  function restoreCard(cardId) {
+    const card = document.getElementById(cardId);
+    cardClickListener(card);
+    card.firstChild.classList.add("game-card-hidden");
+    card.firstChild.textContent = "";
   }
 
   const cardData = setBoard();
-
-  function startGame() {
-    document.getElementById("start-window").classList.add("hidden");
-    document.getElementById("game-window").classList.remove("hidden");
-    setBoardInteraction();
-    gameTimer(5);
-  }
-
-  function endGame() {
-    removeBoardInteraction();
-  }
 
   const gameController = {
     score: 0,
@@ -171,6 +183,18 @@ document.addEventListener("DOMContentLoaded", function () {
       this.previousSelected = null;
     },
   };
+
+  function startGame() {
+    document.getElementById("start-window").classList.add("hidden");
+    document.getElementById("game-window").classList.remove("hidden");
+    setBoardInteraction();
+    gameTimer(5);
+  }
+
+  const endEvent = new Event("gameEnd");
+  function endGame() {
+    removeBoardInteraction();
+  }
 
   document.getElementById("game-start").addEventListener("click", startGame);
 
@@ -185,18 +209,28 @@ document.addEventListener("DOMContentLoaded", function () {
           gameController.previousSelected,
         )
       ) {
+        gameController.score += 10;
+        updateScore();
         console.log(true);
       } else {
+        gameController.score -= 1;
+        updateScore();
         console.log(false);
 
         const currentToRestore = gameController.currentSelected;
         const previousToRestore = gameController.previousSelected;
         let restoreTimer = setTimeout(() => {
-          restoreCards(currentToRestore, previousToRestore);
+          restoreCard(currentToRestore);
+          restoreCard(previousToRestore);
         }, 1000);
+        document.addEventListener("gameEnd", function () {
+          clearTimeout(restoreTimer);
+        });
       }
 
       gameController.clearSelection();
     }
   });
+
+  document.addEventListener("gameEnd", endGame);
 });
