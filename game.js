@@ -1,49 +1,14 @@
 "use strict";
 
-// cat api key
-// live_K3RykO2vhIYOYfR0ES49AC4VCAUPWZkWQk8PihbhQUrSmKY6TExVpIVFi0umhVR9
+document.addEventListener("DOMContentLoaded", function () {
+  // funciones para crear las cartas y el tablero
 
-// https://api.thecatapi.com/v1/images/search?limit=15
-
-async function getPictures() {
-  const pictureUrlList = [];
-  try {
-    const response = await fetch(
-      "https://api.thecatapi.com/v1/images/search?limit=15",
-      {
-        headers: {
-          "x-api-key":
-            "live_K3RykO2vhIYOYfR0ES49AC4VCAUPWZkWQk8PihbhQUrSmKY6TExVpIVFi0umhVR9",
-        },
-      },
-    );
-    if (!response.ok) {
-      throw new Error(`Status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    for (let item of result) {
-      pictureUrlList.push(item.url);
+  function getPictures() {
+    const pictureUrlList = [];
+    for (let i = 0; i < 30; i++) {
+      pictureUrlList.push(`./gatos/img${Math.floor(i / 2)}.jpg`);
     }
     return pictureUrlList;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", async function () {
-  // funciones para crear las cartas y el tablero
-  async function getImageElements() {
-    const urlList = await getPictures();
-    const imgData = {};
-    for (let id = 0; id < 30; id++) {
-      const img = document.createElement("img");
-      const imgId = `img${Math.floor(id / 2)}`;
-      img.src = urlList[Math.floor(id / 2)];
-      img.classList.add("game-card-image");
-      imgData[imgId] = img;
-    }
-    return imgData;
   }
 
   function shuffleCards(array) {
@@ -77,17 +42,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function setBoard() {
     const cardData = {};
-    const numberArray = [];
-    for (let i = 0; i < 30; i++) {
-      numberArray.push(Math.floor(i / 2));
-    }
-    shuffleCards(numberArray);
+    const pictureUrlList = getPictures();
+    shuffleCards(pictureUrlList);
 
     const board = document.getElementById("board");
     for (let id = 0; id < 30; id++) {
       const cardId = `card${id}`;
-      const imgId = `img${numberArray[id]}`;
-      cardData[cardId] = imgId;
+      cardData[cardId] = pictureUrlList[id];
       const newCardContainer = createCardElement(cardId);
       board.appendChild(newCardContainer);
     }
@@ -120,13 +81,14 @@ document.addEventListener("DOMContentLoaded", async function () {
   function flipHandler(event) {
     const card = event.currentTarget.firstChild;
     const cardId = event.currentTarget.id;
-    const imgId = cardData[cardId];
 
     card.classList.toggle("game-card-hidden");
     if (card.classList.contains("game-card-hidden")) {
-      card.removeChild(imgData[imgId]);
+      card.src = "";
     } else {
-      card.appendChild(imgData[imgId]);
+      const img = document.createElement("img");
+      img.src = cardData[cardId];
+      card.append(img);
     }
 
     gameController.previousSelected = gameController.currentSelected;
@@ -169,14 +131,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     const card = document.getElementById(cardId);
     cardClickListener(card);
     card.firstChild.classList.add("game-card-hidden");
-    card.firstChild.textContent = "";
+    const img = card.firstChild.firstChild;
+    card.firstChild.removeChild(img);
   }
 
-  const imgData = await getImageElements();
   const cardData = setBoard();
 
   const gameController = {
     score: 0,
+    pairsRemaining: 15,
     currentSelected: null,
     previousSelected: null,
     clearSelection: function () {
@@ -189,12 +152,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("start-window").classList.add("hidden");
     document.getElementById("game-window").classList.remove("hidden");
     setBoardInteraction();
-    gameTimer(600);
+    gameTimer(60);
   }
 
   const endEvent = new Event("gameEnd");
   function endGame() {
-    //removeBoardInteraction();
+    removeBoardInteraction();
+    document.getElementById("end-window").classList.remove("hidden");
+
+    const username = document.getElementById("username-display");
+    const usernamevalue = document.getElementById("data-user").textContent;
+    username.value = usernamevalue.trim();
+    const score = document.getElementById("score-display");
+    score.value = document.getElementById("data-score").textContent;
   }
 
   document.getElementById("game-start").addEventListener("click", startGame);
@@ -212,6 +182,13 @@ document.addEventListener("DOMContentLoaded", async function () {
       ) {
         gameController.score += 10;
         updateScore();
+        gameController.pairsRemaining--;
+
+        if (gameController.pairsRemaining == 0) {
+          gameController.score += 40;
+          updateScore();
+          document.dispatchEvent(endEvent);
+        }
         console.log(true);
       } else {
         gameController.score -= 1;
@@ -234,4 +211,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   document.addEventListener("gameEnd", endGame);
+
+  document.getElementById("go-back").addEventListener("click", function () {
+    window.location.href = "index.php";
+  });
 });

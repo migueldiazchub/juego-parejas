@@ -27,12 +27,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Page Title</title>
+    <title>Cat Memory</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <img id="cat-left" class="cat-image" src="./gatos/gato.png"/>
+    <img id="cat-right" class="cat-image" src="./gatos/gato.png"/>
     <main id="game-window">
+      <h1>CAT MEMORY</h1>
       <section id="top-player-list">
+        <h2 id="top-player-header">Mejores jugadores</h2>
         <div class="top-player">
           <p class="player-data">NOMBRE: <?php echo $playerList[0] ?></p>
           <p class="player-data">PUNTUACIÓN: <?php echo $scoreList[0] ?></p>
@@ -54,7 +58,7 @@
           <p class="player-data">PUNTUACIÓN: <?php echo $scoreList[4] ?></p>
         </div>
       </section>
-      <form id="user-input" name="user-input" action="game.php" method="post">
+      <form id="user-input" name="user_input" action="game.php" method="post">
         <input
           id="input-username"
           name="username"
