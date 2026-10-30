@@ -1,0 +1,13 @@
+services:
+  php-apache:
+    build:
+      context: ./
+    container_name: juego-parejas
+    restart: always
+    ports:
+      - 3000:80
+    volumes:
+      - ./:/var/www/html
+
+volumes:
+  html: {}

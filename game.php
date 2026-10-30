@@ -1,3 +1,17 @@
+<?php
+  function test_input($data) {
+    if($data == NULL) {
+        return "";
+    }
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+  }
+
+  $username = test_input($_POST["username"]);
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
